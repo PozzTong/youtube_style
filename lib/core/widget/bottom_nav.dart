@@ -4,8 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../features/features.dart';
 
-
-
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
 
@@ -14,41 +12,43 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int index = 0;
-  final ithems = [
-    const Icon(Icons.home, color: Colors.white),
-    const Icon(Icons.menu, color: Colors.white),
-    const Icon(Icons.favorite_outline, color: Colors.white),
-    const Icon(Icons.person, color: Colors.white),
-    const Icon(FontAwesomeIcons.cartPlus, color: Colors.white),
-  ];
-  final screens = [
-    HomeScreen(),
-    Text('1'),
-    Text('1'),
-    Text('1'),
+  int _selectedIndex = 0;
 
-    // const Menu(),
+  final List<Widget> _screens = [
+    const HomeScreen(),
+    const Center(child: Text('Menu')),
+    const Center(child: Text('Favorites')),
+    const Center(child: Text('Profile')),
+    const Center(child: Text('Cart')),
   ];
+
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBody: true,
-      body: screens[index],
+      body: _screens[_selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
-        animationDuration: const Duration(milliseconds: 300),
-
-        onTap: (index) => setState(() => this.index = index),
-        // buttonBackgroundColor: Colors.red,
-        backgroundColor: Colors.transparent,
-
-        color: const Color.fromARGB(255, 27, 44, 73),
+        index: _selectedIndex,
         height: 60,
-        index: index,
-
-        // items: [Icon(Icons.home), Icon(Icons.menu), Icon(Icons.favorite)]
-        items: ithems,
+        backgroundColor: Colors.transparent,
+        color: isDarkMode ? Colors.black : Colors.white,
+        animationDuration: const Duration(milliseconds: 300),
+        onTap: (index) => setState(() => _selectedIndex = index),
+        items: _navBarIcons(isDarkMode),
       ),
     );
+  }
+
+  List<Widget> _navBarIcons(bool isDarkMode) {
+    Color iconColor = isDarkMode ? Colors.white : Colors.black;
+    return [
+      Icon(Icons.home, color: iconColor),
+      Icon(Icons.menu, color: iconColor),
+      Icon(Icons.favorite_outline, color: iconColor),
+      Icon(Icons.person, color: iconColor),
+      Icon(FontAwesomeIcons.cartPlus, color: iconColor),
+    ];
   }
 }

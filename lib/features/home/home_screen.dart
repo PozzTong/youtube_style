@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,78 +8,74 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController _scrollController = ScrollController();
-  double _headerHeight = 100.0;
-  bool _isScrollingDown = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.userScrollDirection ==
-        ScrollDirection.reverse) {
-      if (!_isScrollingDown) {
-        setState(() {
-          _headerHeight = 0.0;
-          _isScrollingDown = true;
-        });
-      }
-    } else if (_scrollController.position.userScrollDirection ==
-        ScrollDirection.forward) {
-      if (_isScrollingDown) {
-        setState(() {
-          _headerHeight = 100.0;
-          _isScrollingDown = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          AnimatedPositioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            duration: Duration(seconds: 5),
-            curve: Curves.fastOutSlowIn,
-            child: Container(
-              color: Colors.red,
-              height: _headerHeight,
-              width: size.width,
-            ),
-          ),
-          Positioned(
-            top: _headerHeight,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              height: size.height - _headerHeight,
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: 50,
-                itemBuilder: (context, index) {
-                  return ListTile(title: Text("Item $index"));
-                },
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverPersistentHeader(
+            delegate: _SliverAppBarDelegate(
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      children: [
+                        Image.asset(
+                          isDarkMode
+                              ? 'assets/logo/white_logo.png'
+                              : "assets/logo/logo.png",
+                          width: 70,
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                    ),
+                    Text('data')
+                  ],
+                ),
               ),
+            ),
+            pinned: false,
+            floating: true,
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => ListTile(
+                title: Text('Item $index'),
+                leading: const Icon(Icons.circle),
+              ),
+              childCount: 20,
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _SliverAppBarDelegate({required this.child});
+
+  @override
+  double get minExtent => 100; // Fixed height
+  @override
+  double get maxExtent => 100; // Fixed height
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
